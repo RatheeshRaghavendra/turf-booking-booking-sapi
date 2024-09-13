@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.turf_booking.booking_sapi.dao.BookingDao;
+import com.turf_booking.booking_sapi.model.ApiError;
+import com.turf_booking.booking_sapi.model.ApiResponse;
 import com.turf_booking.booking_sapi.model.Booking;
 
 @Service
@@ -17,33 +18,65 @@ public class BookingService {
 	@Autowired
 	BookingDao bookingDao;
 	
-	public ResponseEntity<String> addBooking(Booking booking) {
+	public ResponseEntity<ApiResponse<String>> addBooking(Booking booking) {
+		
+		ApiResponse<String> apiResponse = new ApiResponse<>();
+		ApiError apiError = new ApiError();
+		String customError = "";
+		
 		try {
+			
 			Booking bookingResponse = bookingDao.save(booking);
-			return new ResponseEntity<>("The Booking was successful. Here is the Booking ID: " + bookingResponse.getBookingId().toString(),HttpStatus.CREATED);
+			apiResponse.setPayload("The Booking was successful. Here is the Booking ID: " + bookingResponse.getBookingId().toString());
+			
 		} catch (Exception e) {
 			e.printStackTrace();
+			
+			customError = "Error while adding the Booking";
+			
+			apiError.setApiErrorDetails(e, customError);
+			
+			apiResponse.setApiError(apiError);
+			apiResponse.setStatusCode(500);
 		}
-		return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity<>(apiResponse,apiResponse.getStatusMessage());
 	}
 
-	public ResponseEntity<Booking> getBookingById(Integer bookingId) {
+	public ResponseEntity<ApiResponse<Booking>> getBookingById(Integer bookingId) {
+		
+		ApiResponse<Booking> apiResponse = new ApiResponse<>();
+		ApiError apiError = new ApiError();
+		String customError = "";
 		
 		try {
+			
 			Booking booking = bookingDao.findById(bookingId).get();
-			return new ResponseEntity<>(booking,HttpStatus.OK);
+			apiResponse.setPayload(booking);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
+
+			customError = "Error while retrieving the Booking with Booking ID: " + bookingId;
+			
+			apiError.setApiErrorDetails(e, customError);
+			
+			apiResponse.setApiError(apiError);
+			apiResponse.setStatusCode(500);
 		}
 		
-		return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity<>(apiResponse,apiResponse.getStatusMessage());
 	}
 
-	public ResponseEntity<List<Booking>> getbookingByParameter(String parameter, Integer value) {
+	public ResponseEntity<ApiResponse<List<Booking>>> getbookingByParameter(String parameter, Integer value) {
 		
-		List<Booking> bookingList = new ArrayList<>();
+		ApiResponse<List<Booking>> apiResponse = new ApiResponse<>();
+		ApiError apiError = new ApiError();
+		String customError = "";
 		
 		try {
+			
+			List<Booking> bookingList = new ArrayList<>();
+			
 			switch (parameter.toLowerCase()){
 				
 			case "turf": 
@@ -60,25 +93,70 @@ public class BookingService {
 				throw new IllegalArgumentException("Unexpected value: " + parameter);
 			}
 			
-			return new ResponseEntity<>(bookingList,HttpStatus.OK);
+			apiResponse.setPayload(bookingList);
 				
 		} catch (Exception e) {
 			e.printStackTrace();
+
+			customError = "Error while fetching the Bookings by Parameter(" + parameter.toUpperCase() + ") as " + value;
+			
+			apiError.setApiErrorDetails(e, customError);
+			
+			apiResponse.setApiError(apiError);
+			apiResponse.setStatusCode(500);
 		}
 		
-		return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity<>(apiResponse,apiResponse.getStatusMessage());
 	}
 
-	public ResponseEntity<List<Booking>> getAllBookings() {
+	public ResponseEntity<ApiResponse<List<Booking>>> getAllBookings() {
+		
+		ApiResponse<List<Booking>> apiResponse = new ApiResponse<>();
+		ApiError apiError = new ApiError();
+		String customError = "";
 		
 		try {
+			
 			List<Booking> bookingList = bookingDao.findAll();
-			return new ResponseEntity<>(bookingList,HttpStatus.OK);
+			apiResponse.setPayload(bookingList);
+
 		} catch (Exception e) {
 			e.printStackTrace();
+
+			customError = "Error while getting all Bookings";
+			
+			apiError.setApiErrorDetails(e, customError);
+			
+			apiResponse.setApiError(apiError);
+			apiResponse.setStatusCode(500);
 		}
 		
-		return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity<>(apiResponse,apiResponse.getStatusMessage());
+	}
+
+	public ResponseEntity<ApiResponse<String>> cancelBooking(Integer bookingId) {
+		
+		ApiResponse<String> apiResponse = new ApiResponse<>();
+		ApiError apiError = new ApiError();
+		String customError = "";
+		
+		try {
+			
+			bookingDao.deleteById(bookingId);
+			apiResponse.setPayload("The Booking with Booking ID: " + bookingId + " was cancelled");
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+
+			customError = "Error while cancelling the Booking";
+			
+			apiError.setApiErrorDetails(e, customError);
+			
+			apiResponse.setApiError(apiError);
+			apiResponse.setStatusCode(500);
+		}
+		
+		return new ResponseEntity<>(apiResponse,apiResponse.getStatusMessage());
 	}
 
 }
