@@ -18,10 +18,10 @@ public class Booking {
 	Integer bookingId;
 	Integer turfId;
 	@ElementCollection
-	List<Integer> slotIds;
+	List<String> slotIds;
 	Integer userId;
 	
-	public Booking(Integer bookingId, Integer turfId, List<Integer> slotIds, Integer userId) {
+	public Booking(Integer bookingId, Integer turfId, List<String> slotIds, Integer userId) {
 		super();
 		this.bookingId = bookingId;
 		this.turfId = turfId;
