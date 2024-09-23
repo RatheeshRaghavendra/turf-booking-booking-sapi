@@ -41,7 +41,7 @@ public class BookingController {
 	
 	@GetMapping("booking/search-by")
 	public ResponseEntity<ApiResponse<List<Booking>>> getBookingBy (@RequestParam String parameter,@RequestParam Integer value){
-		return bookingService.getbookingByParameter(parameter,value);
+		return bookingService.getBookingByParameter(parameter,value);
 	}
 	
 	@GetMapping("booking/all")
