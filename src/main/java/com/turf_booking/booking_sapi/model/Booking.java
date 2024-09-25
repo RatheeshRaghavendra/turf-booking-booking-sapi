@@ -8,8 +8,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 @Entity
 public class Booking {
 
@@ -20,20 +22,15 @@ public class Booking {
 	@ElementCollection
 	List<String> slotIds;
 	Integer userId;
+	Integer price = 0;
 	
-	public Booking(Integer bookingId, Integer turfId, List<String> slotIds, Integer userId) {
+	public Booking(Integer bookingId, Integer turfId, List<String> slotIds, Integer userId, Integer price) {
 		super();
 		this.bookingId = bookingId;
 		this.turfId = turfId;
 		this.slotIds = slotIds;
 		this.userId = userId;
+		this.price = price;
 	}
-
-	public Booking() {
-		super();
-	}
-	
-	
-	
 	
 }

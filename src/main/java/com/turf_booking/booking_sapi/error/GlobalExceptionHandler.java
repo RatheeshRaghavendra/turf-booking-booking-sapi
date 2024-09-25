@@ -51,7 +51,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({BookingNotFound.class})//, SlotNotFound.class})
-    public ResponseEntity<ApiResponse<String>> handleUserNotException(CustomUserException e){
+    public ResponseEntity<ApiResponse<String>> handleBookingNotFoundException(CustomUserException e){
 
         ApiResponse apiResponse = new ApiResponse<>();
         ApiError apiError = new ApiError();

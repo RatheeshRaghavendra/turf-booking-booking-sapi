@@ -19,7 +19,7 @@ import com.turf_booking.booking_sapi.model.Booking;
 @Log4j2
 public class BookingService {
 
-	private final String prefix = GlobalLog.prefix + getClass().getSimpleName() + "::";
+	private String prefix = GlobalLog.prefix + getClass().getSimpleName() + "::";
 
 	@Autowired
 	BookingDao bookingDao;
@@ -56,7 +56,8 @@ public class BookingService {
 	}
 
 	public ResponseEntity<ApiResponse<List<Booking>>> getBookingByParameter(String parameter, Integer value) {
-		
+
+		String functionPrefix = prefix + "getBookingByParameter::";
 		ApiResponse<List<Booking>> apiResponse = new ApiResponse<>();
 		try {
 			List<Booking> bookingList = switch (parameter.toLowerCase()) {
@@ -64,12 +65,17 @@ public class BookingService {
                 case "user" -> bookingDao.findByUserId(value);
                 default -> throw new IllegalArgumentException("Unexpected value: " + parameter);
             };
+			if(bookingList.isEmpty())
+				throw new BookingNotFound("No Bookings found for the Parameter(" + parameter.toUpperCase() + ") as Value: " + value);
             apiResponse.setPayload(bookingList);
 		} catch (IllegalArgumentException e) {
-			log.error(prefix + "getBookingByParameter::CAUSE::" + e.getClass().getSimpleName() + "::DESCRIPTION::" + e.getMessage());
+			log.error(functionPrefix + "CAUSE::" + e.getClass().getSimpleName() + "::DESCRIPTION::" + e.getMessage());
 			throw new InvalidBooking(e,"Invalid Parameter: " + parameter.toUpperCase());
+		} catch (BookingNotFound e) {
+			log.error(functionPrefix + "CAUSE::" + e.getClass().getSimpleName() + "::DESCRIPTION::" + e.getMessage());
+			throw e;
 		} catch (Exception e) {
-			log.error(prefix + "getBookingByParameter::CAUSE::" + e.getClass().getSimpleName() + "::DESCRIPTION::" + e.getMessage());
+			log.error(functionPrefix + "CAUSE::" + e.getClass().getSimpleName() + "::DESCRIPTION::" + e.getMessage());
 			throw new InvalidBooking(e,"Error while fetching the Bookings by Parameter(" + parameter.toUpperCase() + ") as " + value);
 		}
 		
